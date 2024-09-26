@@ -24,7 +24,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     app.useGlobalFilters(new AllExceptionFilter());
 
-    const swaggerConfig = new DocumentBuilder().setTitle(CONFIGS.APP_NAME).setDescription(CONFIGS.APP_DESCRIPTION).setVersion(APP_VERSION).addBearerAuth().build();
+    const swaggerConfig = new DocumentBuilder().setTitle(CONFIGS.APP_NAME).setDescription(CONFIGS.APP_DESCRIPTION).setVersion(APP_VERSION).setExternalDoc("View in YAML", `${CONFIGS.SWAGGER.PATH}-yaml`).addBearerAuth().build();
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup(CONFIGS.SWAGGER.PATH, app, swaggerDocument);
 
