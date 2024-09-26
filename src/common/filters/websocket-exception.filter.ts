@@ -1,4 +1,4 @@
-import { Socket } from "Socket.io";
+import { Socket } from "socket.io";
 import * as Sentry from "@sentry/nestjs";
 import { BaseWsExceptionFilter, WsException } from "@nestjs/websockets";
 import { ArgumentsHost, BadRequestException, Catch } from "@nestjs/common";
