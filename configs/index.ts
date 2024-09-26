@@ -113,6 +113,11 @@ const CONFIG_BUILDER = {
             PASSWORD: "password",
         },
 
+        SWAGGER: {
+            PATH: "/docs",
+            PASSWORD: "password",
+        },
+
         // e.g
         // STRIPE: {
         //     PUBLIC_KEY: "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -154,6 +159,11 @@ const CONFIG_BUILDER = {
         SOCKET_IO: {
             USERNAME: process.env.SOCKET_IO_USERNAME!,
             PASSWORD: process.env.SOCKET_IO_PASSWORD!,
+        },
+
+        SWAGGER: {
+            PATH: "/docs",
+            PASSWORD: process.env.SWAGGER_PASSWORD!,
         },
 
         // e.g
