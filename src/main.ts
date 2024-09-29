@@ -21,7 +21,7 @@ async function bootstrap() {
     app.useWebSocketAdapter(redisIoAdapter);
     app.enableCors({ credentials: true, origin: [...CONFIGS.CORS_ALLOWED_ORIGINS] });
     app.enableVersioning({ type: VersioningType.URI });
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
     app.useGlobalFilters(new AllExceptionFilter());
 
     const swaggerConfig = new DocumentBuilder().setTitle(CONFIGS.APP_NAME).setDescription(CONFIGS.APP_DESCRIPTION).setVersion(APP_VERSION).setExternalDoc("View in YAML", `${CONFIGS.SWAGGER.PATH}-yaml`).addBearerAuth().build();
