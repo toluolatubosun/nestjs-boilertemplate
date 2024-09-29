@@ -10,6 +10,7 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { PaginationDto } from "src/common/dto/pagination.dto";
 import { HttpResponse } from "src/common/dto/http-response.dto";
 import { GetAllUsersResponseDto, UpdateUserDto } from "./dto/user.dto";
+import { RequestWithUser } from "src/auth/interfaces/request.interface";
 import { ApiHttpErrorResponses, ApiHttpResponse, ApiPaginationQuery, PaginationQuery } from "src/common/decorators/custom-decorator";
 
 @ApiTags("Users")
@@ -23,7 +24,7 @@ export class UsersController {
     @ApiHttpResponse({ status: 200, type: User, description: "Returns the user session" })
     @Get("session")
     @UseGuards(JwtAuthGuard)
-    async getUserSession(@Request() req: Request & { user: User }) {
+    async getUserSession(@Request() req: RequestWithUser) {
         return new HttpResponse("User session", req.user, HttpStatus.OK);
     }
 
@@ -36,8 +37,8 @@ export class UsersController {
     @UseInterceptors(FileInterceptor("file"))
     @UseGuards(JWTRoleGuard(CONFIGS.APP_ROLES.USER))
     async updateUserProfile(
+        @Request() req: RequestWithUser,
         @Body() updateUserDto: UpdateUserDto,
-        @Request() req: Request & { user: User },
         @UploadedFile(new ParseFilePipeBuilder().addFileTypeValidator({ fileType: "image/*" }).addMaxSizeValidator({ maxSize: 100000 }).build({ fileIsRequired: false, errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })) file: Express.Multer.File
     ) {
         const result = await this.usersService.updateUserProfile(req.user, { ...updateUserDto, file });

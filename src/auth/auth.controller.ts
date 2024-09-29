@@ -9,6 +9,7 @@ import { TokenService } from "src/token/token.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtRefreshGuard } from "./guards/jwt-refresh.guard";
 import { HttpResponse } from "src/common/dto/http-response.dto";
+import { RequestWithUser, RequestWithUserAndToken } from "./interfaces/request.interface";
 import { AuthTokensDto, RefreshTokenDto, AuthenticationResponseDto } from "./dto/auth.dto";
 import { ApiHttpErrorResponses, ApiHttpResponse } from "src/common/decorators/custom-decorator";
 import { EmailVerificationDto, RequestEmailVerificationDto } from "./dto/email-verification.dto";
@@ -38,7 +39,7 @@ export class AuthController {
     @HttpCode(200)
     @Post("login")
     @UseGuards(LocalAuthGuard)
-    async login(@Request() req: Request & { user: User }) {
+    async login(@Request() req: RequestWithUser) {
         const result = await this.authService.login(req.user);
         return new HttpResponse("User logged in", result, HttpStatus.OK);
     }
@@ -50,7 +51,7 @@ export class AuthController {
     @HttpCode(200)
     @Post("refresh-tokens")
     @UseGuards(JwtRefreshGuard)
-    async refreshTokens(@Request() req: Request & { user: { user: User; token: string } }) {
+    async refreshTokens(@Request() req: RequestWithUserAndToken) {
         const result = await this.tokenService.refreshAuthTokens(req.user.user, req.user.token);
         return new HttpResponse("Tokens refreshed", result, HttpStatus.OK);
     }
@@ -62,7 +63,7 @@ export class AuthController {
     @HttpCode(200)
     @Post("logout")
     @UseGuards(JwtRefreshGuard)
-    async logout(@Request() req: Request & { user: { user: User; token: string } }) {
+    async logout(@Request() req: RequestWithUserAndToken) {
         const result = await this.tokenService.revokeRefreshToken(req.user.user, req.user.token);
         return new HttpResponse("User logged out", result, HttpStatus.OK);
     }
