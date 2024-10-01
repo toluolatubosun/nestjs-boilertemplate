@@ -7,7 +7,19 @@ This is a template for a NestJS GraphQL project.
 ## Installation
 
 ```bash
-$ npm install
+$ yarn install
+```
+
+## Provision resources for development
+
+A `docker-compose.yml` file is provided to provision a PostgreSQL database, SMTP server and a Redis server for development.
+
+```bash
+# start the services
+$ docker-compose up -d
+
+# stop the services
+$ docker-compose down
 ```
 
 ## Migrations
@@ -28,12 +40,12 @@ yarn migration:run
 
 ```bash
 # development
-$ npm run start
+$ yarn start
 
 # watch mode
-$ npm run start:dev
+$ yarn start:dev
 
 # production mode
-$ npm run start:prod
+$ yarn start:prod
 ```
 
