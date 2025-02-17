@@ -17,7 +17,7 @@ import { AwsService } from "src/aws/aws.service";
                     if (!config.get("CONFIGS.AWS.SECRET_ACCESS_KEY")) throw new Error("AWS_SECRET_ACCESS_KEY config not found");
 
                     return {
-                        transporter: {
+                        transport: {
                             sendingRate: 50,
                             SES: { aws: aws, ses: awsService.sesClient },
                         },
