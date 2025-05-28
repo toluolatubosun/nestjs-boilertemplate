@@ -1,16 +1,19 @@
 import crypto from "crypto";
 import bcryptjs from "bcryptjs";
-import { Repository } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { LessThan, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
 
 import { User } from "src/users/entities/user.entity";
 import { Token, TokenType } from "./entities/token.entity";
 
 @Injectable()
 export class TokenService {
+    private readonly logger = new Logger(TokenService.name);
+
     constructor(
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
@@ -58,16 +61,12 @@ export class TokenService {
             const isValid = await bcryptjs.compare(refreshToken, String(singleToken.token));
 
             if (isValid === true) {
-                // Delete the previous refresh-token from database
-                await this.tokensRepository.delete({ id: singleToken.id });
-
                 // Check if refresh-token is expired, if yes, throw error
-                if (new Date() > singleToken.expires_at) {
-                    throw new HttpException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
-                }
+                if (new Date() > singleToken.expires_at) throw new HttpException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
 
-                // Generate new access token and refresh-token JWT
-                return await this.generateAuthTokens(user);
+                // Generate access token
+                const accessTokenJWT = this.jwtService.sign({ sub: user.id }, { secret: this.configService.get("CONFIGS.JWT_SECRET"), expiresIn: this.configService.get("CONFIGS.ACCESS_TOKEN_JWT_EXPIRES_IN") / 1000 });
+                return { access_token: accessTokenJWT };
             }
         }
 
@@ -143,6 +142,23 @@ export class TokenService {
         if (deleteIfValidated === true) {
             // If code and token is valid, delete the token
             await this.tokensRepository.delete({ user, type: tokenType });
+        }
+
+        return true;
+    }
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    async deleteExpiredTokens() {
+        const currentDate = new Date();
+        const expiredTokens = await this.tokensRepository.find({
+            where: { expires_at: LessThan(currentDate) },
+        });
+
+        if (expiredTokens.length > 0) {
+            const deleteResult = await this.tokensRepository.delete(expiredTokens.map((token) => token.id));
+            this.logger.log(`Deleted ${deleteResult.affected} expired tokens, ${expiredTokens.length} tokens found`);
+        } else {
+            this.logger.log("No expired tokens found");
         }
 
         return true;
